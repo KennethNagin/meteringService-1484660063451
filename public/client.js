@@ -11,11 +11,13 @@ $(document).ready(function() {
 	});
   });
 
-  $("#sb2").click(function(){
-  	$.get("/key", function(string) {
-    	$('#txtString2').val(string);
+
+  $("#sb3").click(function(){
+  	$.get("/getKey/"+$('#key').val(), function(message) {
+    	$('#txtString3').val(message);
 	});
   }); 
+ 
  
 
 });

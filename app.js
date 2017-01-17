@@ -24,7 +24,7 @@ var appEnv = cfenv.getAppEnv();
 
 // http://expressjs.com/en/starter/basic-routing.html
 app.get("/", function (request, response) {
-  response.sendFile(__dirname + '/views/index.html');
+  response.sendFile(__dirname + '/public/index.html');
 });
 
 app.get("/string", function(req, res) {
@@ -33,8 +33,12 @@ app.get("/string", function(req, res) {
     res.send(strings[n])
 });
 
-app.get("/key", function(client_req, client_res) {
-   console.log("entered chaincodeRequest");
+//app.get("/key", function(client_req, client_res) {
+app.get("/getKey/:key", function(client_req, client_res) {
+   console.log("entered getKey");
+   console.log(client_req);
+   console.log(client_req.params);
+   console.log(client_req.params.key);
     var response = "";
 	var opts = {
 		__method: 'query',
@@ -54,7 +58,7 @@ app.get("/key", function(client_req, client_res) {
     	ctorMsg: {
       		function: 'read',
        		args: 
-         	['hello_world']
+         	[client_req.params.key]
       
     	},
     	secureContext: 'user_type1_1'
@@ -114,6 +118,3 @@ app.listen(appEnv.port, '0.0.0.0', function() {
   console.log("server starting on " + appEnv.url);
 });
 
-app.post('/test', function (req, res) {
-    console.log('works');
-});
