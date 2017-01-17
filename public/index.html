@@ -7,19 +7,31 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="stylesheets/style.css">
+	
+	    <!-- Your web-app is https, so your scripts need to be too -->
+    <script src="https://code.jquery.com/jquery-2.2.1.min.js"
+            integrity="sha256-gvQgAFzTH6trSrAWoH1iPo9Xc96QxSZ3feW6kem+O00="
+            crossorigin="anonymous"></script>
+    <script src="/client.js"></script>
+
+	
+</head>
   </head>
 
   <body>
+    <h1>IBM Blockchain access</h1>
+    <input type="text" id="txtString"></input>
+	<input type ="button" id = "sb" value="Set Key"/>
+	
+	<input type="text" id="txtString2"></input>
+	<input type ="button" id = "sb2" value="Get Key"/>
+
+
     <table>
       <tr>
         <td style= "width:30%;">
           <img class = "newappIcon" src="images/newapp-icon.png">
         </td>
-        <td>
-          <h1 id="message">Hello World!</h1>
-          <p class='description'></p> Thanks for creating a <span class = "blue">NodeJS Starter Application</span>.
-        </td>
-      </tr>
     </table>
   </body>
 
