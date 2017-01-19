@@ -8,6 +8,8 @@ var https = require('https');
 // This application uses express as its web server
 // for more info, see: http://expressjs.com
 var express = require('express');
+var bodyParser = require('body-parser');
+
 
 // cfenv provides access to your Cloud Foundry environment
 // for more info, see: https://www.npmjs.com/package/cfenv
@@ -15,7 +17,11 @@ var cfenv = require('cfenv');
 
 // create a new express server
 var app = express();
-
+//app.use(bodyParser()); // not supported
+//app.use(bodyParser.raw()); // support json encoded bodies
+app.use(bodyParser.json()); // support json encoded bodies
+//app.use(bodyParser.urlencoded({ extended: true })); 
+ 
 // serve the files out of ./public as our main files
 app.use(express.static(__dirname + '/public'));
 
@@ -33,32 +39,55 @@ app.get("/string", function(req, res) {
     res.send(strings[n])
 });
 
-//app.get("/key", function(client_req, client_res) {
+
+
 app.get("/getKey/:key", function(client_req, client_res) {
    console.log("entered getKey");
-   console.log(client_req);
-   console.log(client_req.params);
    console.log(client_req.params.key);
+   chainArgs = [client_req.params.key];
+   //blockChainReq(client_req, client_res, 'query', 'read',chainArgs);
+   blockChainReq(client_req, client_res, 'query', 'read',chainArgs);
+});
+
+app.post("/setKey/:key", function(client_req, client_res) {
+   console.log("entered setKey");
+   console.log(client_req.params)
+   console.log(client_req.body);
+   console.log('body: ' + JSON.stringify(client_req.body));
+   console.log('key: '+client_req.params.key);
+   console.log('keyValue: '+client_req.body.keyValue);
+   chainArgs = [client_req.params.key,client_req.body.keyValue];
+   //blockChainReq(client_req, client_res, 'query', 'read',chainArgs);
+   blockChainReq(client_req, client_res, 'invoke', 'write',chainArgs);
+});
+
+// start server on the specified port and binding host
+app.listen(appEnv.port, '0.0.0.0', function() {
+  // print a message when the server starts listening
+  console.log("server starting on " + appEnv.url);
+});
+
+function blockChainReq(client_req, client_res, chainMethod, chainFunction, chainArgs) {
+   console.log("entered blockChainReq");
+   console.log(client_req.params);
+   console.log(`chainMethod: ${chainMethod}, chainFunction: ${chainFunction}, chainArgs: ${chainArgs} `);
+
+   console.log(chainMethod);
+   console.log(chainFunction);
+   console.log(chainArgs);
     var response = "";
-	var opts = {
-		__method: 'query',
-		_function: 'read',
-		_args: ['hello_world'],
-		user: 'user_type1_1'
-	};
 	var postData = JSON.stringify(
 	{
   		jsonrpc: '2.0',
-  		method: 'query',
+  		method: chainMethod,
   		params: {
     		type: 1,
     		chaincodeID: {
       		name: 'f6ba21de8d133c0df54fa8cf973617207d7e10a554ef93816912bd81f8b79c56c2905587a1772e8e6a9f52e66e40dacfbd5b3c803524a378b62971ac9023243b'
     	},
     	ctorMsg: {
-      		function: 'read',
-       		args: 
-         	[client_req.params.key]
+      		function: chainFunction,
+       		args: chainArgs
       
     	},
     	secureContext: 'user_type1_1'
@@ -91,13 +120,11 @@ app.get("/getKey/:key", function(client_req, client_res) {
   		res.on('end', () => {
     		console.log('request ended:');
 			var responseBody = JSON.parse(body)
-    		console.log(`responsebody: ${responseBody}`);
     		console.log(`responsebody: ${JSON.stringify(responseBody)}`);
     		console.log(`result: ${JSON.stringify(responseBody.result)}`);
 //			client_res.send(JSON.stringify(responseBody.result.message));
-			client_res.send(responseBody.result.message);
-			//res.send("done");
-			//response = JSON.stringify(responseBody.result)
+//	client_res.send(responseBody.result.message);
+			client_res.send(responseBody.result);
   		});
 	});
 
@@ -109,12 +136,6 @@ app.get("/getKey/:key", function(client_req, client_res) {
 	// write data to request body
 	req.write(postData);
 	req.end();
-
 	
-});
-// start server on the specified port and binding host
-app.listen(appEnv.port, '0.0.0.0', function() {
-  // print a message when the server starts listening
-  console.log("server starting on " + appEnv.url);
-});
 
+}
